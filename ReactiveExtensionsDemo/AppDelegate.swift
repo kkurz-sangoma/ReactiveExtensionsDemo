@@ -20,6 +20,15 @@ struct Contact {
     
     // Optional fields
     let picture: String?
+    
+    func sectionIndex(with sortOrder: ContactSortOrder) -> String {
+        switch sortOrder {
+        case .firstName:
+            return "\(firstName.prefix(1))"
+        case .lastName:
+            return "\(lastName.prefix(1))"
+        }
+    }
 }
 
 extension Contact {
@@ -38,10 +47,8 @@ extension Contact {
 }
 
 enum ContactSortOrder {
-    case number
     case firstName
     case lastName
-    case email
 }
 
 @main
@@ -93,14 +100,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             .map { (dictionary, order) in
                 return dictionary.values.sorted { (lhs, rhs) -> Bool in
                     switch order {
-                    case .email:
-                        return lhs.email < rhs.email
                     case .firstName:
                         return lhs.firstName < rhs.firstName
                     case .lastName:
                         return lhs.lastName < rhs.lastName
-                    case .number:
-                        return lhs.number < rhs.number
                     }
                 }
             }.bind { self.contactList.onNext($0) }

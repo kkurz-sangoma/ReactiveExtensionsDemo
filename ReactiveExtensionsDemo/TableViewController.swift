@@ -115,7 +115,4 @@ class TableViewController: UITableViewController {
                 }
             }.disposed(by: disposeBag)
     }
-
-
 }
-

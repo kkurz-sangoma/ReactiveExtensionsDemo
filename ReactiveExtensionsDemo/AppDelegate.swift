@@ -86,6 +86,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ]
     """
     
+    let updatedContactStr = """
+    [
+        {"id": "qjvn", "number": 100, "firstName": "Alfred", "lastName": "Apple", "email": "zapple@home.com", "picture": "https://firebasestorage.googleapis.com/v0/b/you-belong-1503433655652.appspot.com/o/shared%2Fclock.png?alt=media&token=8069e710-dad9-451c-8409-2ccbbe970e5f"},
+        {"id": "alsdkfj", "number": 101, "firstName": "Brian", "lastName":"Banana", "email":"bbanana@home.com"},
+        {"id": "oiavj", "number": 102, "firstName": "Charles", "lastName": "Coconut", "email": "ccoconut@home.com"},
+        {"id": "1", "number": 972, "firstName": "Diane", "lastName": "Date", "email": "wdate@home.com"},
+        {"id": "biojw", "number": 23456, "firstName": "Eduardo", "lastName": "Eggplant", "email": "veggplant@home.com", "picture": "https://firebasestorage.googleapis.com/v0/b/you-belong-1503433655652.appspot.com/o/shared%2Fsocial.png?alt=media&token=deed1b8b-22d7-4a38-adfc-9cdd4818b62a"},
+        {"id": "b34bdv", "number": 725, "firstName": "Famke", "lastName": "Fig", "email": "ufig@home.com"},
+        {"id": "abq35f", "number": 2345, "firstName": "Gina", "lastName": "Grape", "email": "tgrape@home.com"},
+        {"id": "23hbad", "number": 2783, "firstName": "Herbert", "lastName": "Honeydew", "email": "shoneydew@home.com"},
+        {"id": "qefbqe", "number": 465, "firstName": "Imogene", "lastName": "Imbe", "email": "rimbe@home.com"},
+        {"id": "3bwetfbad", "number": "0892734", "firstName": "Jason", "lastName": "Juniper", "email": "qjuniper@home.com", "picture": "https://firebasestorage.googleapis.com/v0/b/you-belong-1503433655652.appspot.com/o/shared%2Fnotes.png?alt=media&token=39cf5622-73ac-4b9c-b4d1-a6d636950e19"},
+        {"id": "qbne", "number": 7651, "firstName": "Kevin", "lastName": "Kungdong", "email": "pkungdong@home.com"},
+        {"id": "sa", "number": 10349, "firstName": "Leila", "lastName": "Limeberry", "email": "olimeberry@home.com"},
+        {"id": "25ywnhwg", "number": 102, "firstName": "Madaline", "lastName": "Muscadine", "email": "nmuscadine@home.com", "picture": ""},
+        {"id": "ng34nb", "number": 145, "firstName": "Natalie", "lastName": "Nectarine", "email": "mnectarine@home.com", "picture": "https://firebasestorage.googleapis.com/v0/b/you-belong-1503433655652.appspot.com/o/shared%2Fgiving.png?alt=media&token=12b73603-edd5-449b-9969-9e87f3b8005e"},
+        {"id": "whm357j", "number": 925, "firstName": "Oscar", "lastName": "Orange", "email": "lorange@home.com"},
+        {"id": "36jthn", "number": 1234, "firstName": "Paul", "lastName": "Papaya", "email": "kpapaya@home.com"},
+        {"id": "34wnwrg", "number": 896, "firstName": "Quincy", "lastName": "Quince", "email": "jquince@home.com", "picture": "https://firebasestorage.googleapis.com/v0/b/you-belong-1503433655652.appspot.com/o/shared%2Fconnection.png?alt=media&token=ef05d21e-70b7-47de-8773-fdcf82152c8e"},
+        {"id": "kdeghjd", "number": 9345, "firstName": "Raymond", "lastName": "Rambutan", "email": "irambutan@home.com"},
+        {"id": "dfghjmd", "number": 256, "firstName": "Sophia", "lastName": "Strawberry", "email": "hstrawberry@home.com"},
+        {"id": "cvnme", "number": 257264, "firstName": "Tammy", "lastName": "Tamarind", "email": "gtamarind@home.com"},
+        {"id": "35ym", "number": 3467, "firstName": "Usela", "lastName": "Ugli", "email": "fugli@home.com", "picture": 32},
+        {"id": "7", "number": 34, "firstName": "Vincent", "lastName": "Vanilla", "email": "evanilla@home.com"},
+        {"id": "emthm4u", "number": 36, "firstName": "Wesley", "lastName": "Walnut", "email": "dwalnut@home.com"},
+        {"id": "etjem", "number": 2, "firstName": "Xavier", "lastName": "Ximenia", "email": "cximenia@home.com"},
+        {"id": "246nwfb", "number": 6579, "firstName": "Yvette", "lastName": "Yam", "email": "byam@home.com"},
+        {"id": "24nwrg", "firstName": "Zachary", "lastName": "Zucchini", "email": "azucchini@home.com"}
+    ]
+    """
+    
     // Public observables for various other parts of the codebase
     public let contactDictionary = BehaviorSubject<[String: Contact]>(value: [:])
     public let contactList = BehaviorSubject<[Contact]>(value: [])
@@ -117,6 +148,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     result[contact.id] = contact
                 }
             contactDictionary.onNext(contacts)
+        }
+        
+        // Pretend we got a server update about 15s after launching
+        Timer.scheduledTimer(withTimeInterval: 15.0, repeats: false) { _ in
+            if let data = self.updatedContactStr.data(using: .utf8),
+                let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]] {
+                let contacts = json.compactMap { Contact(from: $0) }
+                    .reduce(into: [String: Contact]()) { (result, contact) in
+                        result[contact.id] = contact
+                    }
+                self.contactDictionary.onNext(contacts)
+            }
         }
         return true
     }

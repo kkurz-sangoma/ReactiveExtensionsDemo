@@ -8,6 +8,7 @@ target 'ReactiveExtensionsDemo' do
   # Pods for ReactiveExtensionsDemo
   pod 'RxSwift'
   pod 'RxDataSources'
+  pod 'SDWebImage'
 
   target 'ReactiveExtensionsDemoTests' do
     inherit! :search_paths
